@@ -1,18 +1,38 @@
-# React + Vite
+# Frontend - Sistema de Tarefas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface web desenvolvida em **React** com **Vite** para o gerenciamento de tarefas, consumindo a API backend Node.js.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Visualização de tarefas
+- Criação, edição e remoção de tarefas
+- Integração com API RESTful
 
-## React Compiler
+## Estrutura do Projeto
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+```
+frontend/
+├── public/           # Arquivos estáticos
+├── src/              # Código-fonte React
+│   ├── assets/       # Imagens e outros assets
+│   ├── App.jsx       # Componente principal
+│   ├── main.jsx      # Ponto de entrada
+│   └── ...           # Outros componentes e estilos
+├── package.json      # Dependências e scripts
+└── vite.config.js    # Configuração do Vite
+```
 
-Note: This will impact Vite dev & build performances.
+## Como rodar
 
-## Expanding the ESLint configuration
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+2. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Observações
+
+Certifique-se de que o backend esteja rodando para que a interface funcione corretamente.
