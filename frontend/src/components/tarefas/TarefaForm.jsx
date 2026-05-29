@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import api from "../../services/api";
 
 export default function TarefaForm({
   descricao,
@@ -7,20 +8,7 @@ export default function TarefaForm({
   cadastrarTarefa,
 }) {
   const criarNoBackend = async (titulo) => {
-    try {
-      const res = await fetch("http://localhost:3000/tarefas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.erro || "Erro ao criar tarefa");
-      }
-      return await res.json();
-    } catch (error) {
-      throw error;
-    }
+    return api.post("/tarefas", { titulo });
   };
 
   const handleSubmit = async (event) => {
