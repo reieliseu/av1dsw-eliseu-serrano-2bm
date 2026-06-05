@@ -1,22 +1,28 @@
-const BASE = "http://localhost:3000";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:3000",
+  headers: { "Content-Type": "application/json" },
+});
 
 export async function get(path) {
-  const res = await fetch(`${BASE}${path}`);
-  if (!res.ok) throw new Error("Network error");
-  return res.json();
+  try {
+    const res = await api.get(path);
+    return res.data;
+  } catch (err) {
+    const msg = err.response?.data?.erro || err.message || "Network error";
+    throw new Error(msg);
+  }
 }
 
 export async function post(path, body) {
-  const res = await fetch(`${BASE}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.erro || "Network error");
+  try {
+    const res = await api.post(path, body);
+    return res.data;
+  } catch (err) {
+    const msg = err.response?.data?.erro || err.message || "Network error";
+    throw new Error(msg);
   }
-  return res.json();
 }
 
-export default { get, post };
+export default { get, post, api };

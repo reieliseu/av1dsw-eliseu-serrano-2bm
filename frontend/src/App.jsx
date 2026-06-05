@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import TarefasPage from "./pages/tarefas/TarefasPage";
+import TarefasPage from "./pages/TarefaPage/";
 
 function App() {
   return <TarefasPage />;

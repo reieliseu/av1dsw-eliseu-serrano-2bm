@@ -1,11 +1,10 @@
 import React from "react";
-import PropTypes from "prop-types";
 import api from "../../services/api";
 
 export default function TarefaForm({
   descricao,
   setDescricao,
-  cadastrarTarefa,
+  cadastrarTarefa = undefined,
 }) {
   const criarNoBackend = async (titulo) => {
     return api.post("/tarefas", { titulo });
@@ -54,13 +53,3 @@ export default function TarefaForm({
     </form>
   );
 }
-
-TarefaForm.propTypes = {
-  descricao: PropTypes.string.isRequired,
-  setDescricao: PropTypes.func.isRequired,
-  cadastrarTarefa: PropTypes.func,
-};
-
-TarefaForm.defaultProps = {
-  cadastrarTarefa: undefined,
-};

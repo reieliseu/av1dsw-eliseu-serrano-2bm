@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import TarefaForm from "../../components/tarefas/TarefaForm.jsx";
-import TarefaTabela from "../../components/tarefas/TarefaTabela.jsx";
-import api from "../../services/api";
+import TarefaForm from "../../components/TarefaForm/";
+import TarefaTabela from "../../components/TarefaTabela/";
+import api from "../../services/api.js";
 
 export default function TarefasPage() {
   const [descricao, setDescricao] = useState("");
