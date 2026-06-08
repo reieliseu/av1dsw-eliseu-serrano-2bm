@@ -28,7 +28,17 @@ frontend/
    ```bash
    npm install
    ```
-2. Inicie o servidor de desenvolvimento:
+2. Crie um arquivo de ambiente a partir do exemplo e configure se necessário:
+   - Unix / Git Bash / WSL:
+     ```bash
+     cp .env.example .env
+     ```
+   - PowerShell (Windows):
+     ```powershell
+     Copy-Item .env.example .env
+     ```
+
+3. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
    ```
@@ -36,3 +46,10 @@ frontend/
 ## Observações
 
 Certifique-se de que o backend esteja rodando para que a interface funcione corretamente.
+
+## Variáveis de ambiente
+
+- `VITE_API_BASE_URL`: URL base da API backend (ex.: `http://localhost:3000`).
+
+O arquivo `src/services/api.js` usa `import.meta.env.VITE_API_BASE_URL` e
+cairá para `http://localhost:3000` caso não haja variável definida.
