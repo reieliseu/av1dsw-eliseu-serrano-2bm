@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import TarefaForm from "../../components/TarefaForm/";
 import TarefaTabela from "../../components/TarefaTabela/";
+import ConfirmModal from "../../components/ConfirmModal/";
+import EditModal from "../../components/EditModal/";
 import api from "../../services/api.js";
 
 export default function TarefasPage() {
@@ -32,10 +34,19 @@ export default function TarefasPage() {
     }
     buscarTarefas();
   };
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [editingTarefa, setEditingTarefa] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
-  const handleDelete = async (id) => {
-    if (!confirm("Confirmar exclusão dessa tarefa?")) return;
+  const handleDelete = (id) => {
+    setConfirmDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    const id = confirmDeleteId;
+    if (!id) return;
     try {
+      setModalLoading(true);
       addLoading(id);
       await api.del(`/tarefas/${id}`);
       setTarefas((prev) => prev.filter((t) => t.id !== id));
@@ -44,32 +55,39 @@ export default function TarefasPage() {
       alert(err.message || "Erro ao excluir tarefa");
     } finally {
       removeLoading(id);
+      setModalLoading(false);
+      setConfirmDeleteId(null);
     }
   };
 
-  const handleEdit = async (tarefa) => {
-    const novo = prompt(
-      "Novo título:",
-      tarefa.titulo || tarefa.descricao || "",
-    );
-    if (novo === null) return; // cancelou
-    const titulo = novo.trim();
+  const cancelDelete = () => setConfirmDeleteId(null);
+
+  const handleEdit = (tarefa) => {
+    setEditingTarefa(tarefa);
+  };
+
+  const saveEdit = async (updatedTarefa) => {
+    const id = updatedTarefa.id;
+    const titulo = (updatedTarefa.titulo || "").trim();
     if (!titulo) {
       alert("Título não pode ser vazio");
       return;
     }
 
     try {
-      addLoading(tarefa.id);
-      const updated = await api.put(`/tarefas/${tarefa.id}`, { titulo });
+      setModalLoading(true);
+      addLoading(id);
+      const updated = await api.put(`/tarefas/${id}`, { titulo });
       setTarefas((prev) =>
         prev.map((t) => (t.id === updated.id ? updated : t)),
       );
+      setEditingTarefa(null);
     } catch (err) {
       console.error(err);
       alert(err.message || "Erro ao editar tarefa");
     } finally {
-      removeLoading(tarefa.id);
+      removeLoading(id);
+      setModalLoading(false);
     }
   };
 
@@ -99,6 +117,23 @@ export default function TarefasPage() {
           loadingIds={loadingIds}
         />
       </div>
+
+      <ConfirmModal
+        open={!!confirmDeleteId}
+        title="Excluir tarefa"
+        message="Tem certeza que deseja excluir esta tarefa?"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        loading={modalLoading}
+      />
+
+      <EditModal
+        open={!!editingTarefa}
+        tarefa={editingTarefa}
+        onSave={saveEdit}
+        onCancel={() => setEditingTarefa(null)}
+        loading={modalLoading}
+      />
     </section>
   );
 }
