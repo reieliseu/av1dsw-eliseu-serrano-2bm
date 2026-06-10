@@ -9,6 +9,7 @@ export default function TarefasPage() {
   const [descricao, setDescricao] = useState("");
   const [tarefas, setTarefas] = useState([]);
   const [loadingIds, setLoadingIds] = useState([]);
+  const [sortAsc, setSortAsc] = useState(true);
 
   const addLoading = (id) => setLoadingIds((p) => [...p, id]);
   const removeLoading = (id) => setLoadingIds((p) => p.filter((x) => x !== id));
@@ -33,6 +34,81 @@ export default function TarefasPage() {
       return;
     }
     buscarTarefas();
+  };
+
+  // Ordenar tarefas por título (cliente)
+  const handleSortRequested = () => {
+    setSortAsc((prev) => {
+      const next = !prev;
+      setTarefas((curr) =>
+        [...curr].sort((a, b) => {
+          const va = (a.titulo || a.descricao || "").toLowerCase();
+          const vb = (b.titulo || b.descricao || "").toLowerCase();
+          if (va < vb) return next ? -1 : 1;
+          if (va > vb) return next ? 1 : -1;
+          return 0;
+        }),
+      );
+      return next;
+    });
+  };
+
+  // Marcar todas as tarefas como concluídas (faz PUT em cada uma)
+  const handleMarkAllRequested = async () => {
+    const toMark = tarefas.filter((t) => !t.concluida);
+    if (toMark.length === 0) {
+      alert("Não há tarefas não concluídas para marcar");
+      return;
+    }
+    try {
+      // adicionar todos aos loadingIds
+      toMark.forEach((t) => addLoading(t.id));
+      const promises = toMark.map((t) =>
+        api.put(`/tarefas/${t.id}`, { concluida: true }).then((updated) => {
+          setTarefas((prev) =>
+            prev.map((p) => (p.id === updated.id ? updated : p)),
+          );
+        }),
+      );
+      await Promise.all(promises);
+      alert("Todas as tarefas marcadas como concluídas");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Erro ao marcar tarefas");
+    } finally {
+      toMark.forEach((t) => removeLoading(t.id));
+    }
+  };
+
+  // Exportar CSV das tarefas
+  const handleExportRequested = () => {
+    if (!Array.isArray(tarefas) || tarefas.length === 0) {
+      alert("Nenhuma tarefa para exportar");
+      return;
+    }
+    const headers = ["id", "titulo", "descricao", "concluida", "criadoEm"];
+    const rows = tarefas.map((t) => [
+      t.id,
+      t.titulo || "",
+      t.descricao || "",
+      t.concluida,
+      t.criadoEm || "",
+    ]);
+    const csv = [
+      headers.join(","),
+      ...rows.map((r) =>
+        r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","),
+      ),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tarefas.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   };
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [editingTarefa, setEditingTarefa] = useState(null);
@@ -115,6 +191,9 @@ export default function TarefasPage() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           loadingIds={loadingIds}
+          onSortRequested={handleSortRequested}
+          onMarkAllRequested={handleMarkAllRequested}
+          onExportRequested={handleExportRequested}
         />
       </div>
 
